@@ -121,3 +121,30 @@ namespace TicTacToeTests
             space.Id |> should equal 1
             space.Mark |> should equal '_'
 
+        [<Test>]
+        let ``Grid can check if full`` () =
+            let grid = new Grid()
+            grid.CheckIfFull |> should equal false
+            for i in grid.Spaces do
+                i.SetMark 'x'
+            grid.CheckIfFull |> should equal true
+
+        [<Test>]
+        let ``Grid Get Row returns row per number`` () =
+            let grid = new Grid()
+            grid.GetRow 4 |> should haveLength 3
+            
+            let space id =
+                checkListForId (grid.GetRow 4) id        
+
+            (space 1).Id |> should equal 1
+            (space 4).Id |> should equal 4
+            (space 7).Id |> should equal 7
+
+        [<Test>]
+        let ``Grid MarkSpace Sets mark for Indicated Space`` () =
+            let grid = new Grid()
+            grid.MarkSpace 1 'x'
+            (grid.GetSpace 1).Mark |> should equal 'x'
+            
+

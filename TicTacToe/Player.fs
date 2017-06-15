@@ -2,8 +2,9 @@ namespace TicTacToe
 
 open TicTacToe
 
-type public Player(mark: char) = class
+type public Player(name: string, mark: char) = class
 
+    member x.Name = name
     member x.Mark = mark
 
 end

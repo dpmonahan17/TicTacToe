@@ -1,6 +1,6 @@
 namespace TicTacToe
 
-module Board =
+module Program =
     let nothing = 
         printf "nothing"
 

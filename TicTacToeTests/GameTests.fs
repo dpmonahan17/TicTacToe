@@ -8,5 +8,20 @@ namespace TicTacToeTests
         open TicTacToe
     
         [<Test>]
-        let ``Nothing`` () =
-            1 |> should equal 1
+        let ``Game should have a player 1`` () =
+            let game = Game()
+            game.PlayerOne :? Player |> should equal true
+
+        [<Test>]
+        let ``Game should have a player 2`` () =
+            let game = Game()
+            game.PlayerTwo :? Player |> should equal true
+
+        [<Test>]
+        let ``Game should have a board`` () =
+            let game = Game()
+            game.GetGrid :? Grid |> should equal true
+
+        // [<Test>]
+        // let ``State should have three types`` () =
+            

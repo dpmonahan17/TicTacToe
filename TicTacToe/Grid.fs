@@ -38,7 +38,24 @@ type public Grid() = class
     member x.RightDiagonal =
         getSpaces 3 5 7 spaces
 
+    member x.GetRow (row:int) =
+        match row with
+        | 1 -> x.RowOne
+        | 2 -> x.RowTwo
+        | 3 -> x.RowThree
+        | 4 -> x.ColumnOne
+        | 5 -> x.ColumnTwo
+        | 6 -> x.ColumnThree
+        | 7 -> x.LeftDiagonal
+        | 8 -> x.RightDiagonal
+
     member x.GetSpace id =
         spaces |> List.find(fun i -> i.Id = id)
+
+    member x.CheckIfFull =
+        spaces |> List.filter(fun i -> i.Mark = '_') |> List.isEmpty
+
+    member x.MarkSpace id mark =
+        (x.GetSpace id).SetMark mark
 
 end

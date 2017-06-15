@@ -9,5 +9,10 @@ namespace TicTacToeTests
     
         [<Test>]
         let ``Player should have a Mark`` () =
-            let player = Player('x')
+            let player = Player("Ezekiel", 'x')
             player.Mark |> should equal 'x'
+
+        [<Test>]
+        let ``Player should have a Name`` () =
+            let player = Player("Ezekiel", 'x')
+            player.Name |> should equal "Ezekiel"
