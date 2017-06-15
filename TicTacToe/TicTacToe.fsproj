@@ -40,6 +40,7 @@
     <Compile Include="Space.fs" />
     <Compile Include="Grid.fs" />
     <Compile Include="Scorer.fs" />
+    <Compile Include="Player.fs" />
     <Compile Include="Game.fs" />
     <None Include="Script.fsx" />
     <Compile Include="Program.fs" />
