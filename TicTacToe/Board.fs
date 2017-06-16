@@ -3,7 +3,7 @@ namespace TicTacToe
 
 module Board =
 
-    let printBoardGuid =
+    let printBoardGrid =
         printf "Board Index - Press Number for grid to place marker"
         printf " 1 | 2 | 3 \n"
         printf "===========\n"

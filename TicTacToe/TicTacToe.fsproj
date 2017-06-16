@@ -38,9 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Space.fs" />
-    <Compile Include="Grid.fs" />
     <Compile Include="Board.fs" />
     <Compile Include="Scorer.fs" />
+    <Compile Include="Grid.fs" />
     <Compile Include="Player.fs" />
     <Compile Include="TurnState.fs" />
     <Compile Include="Game.fs" />

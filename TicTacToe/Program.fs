@@ -1,8 +1,5 @@
 namespace TicTacToe
 
-module Program =
-    let nothing = 
-        printf "nothing"
 
 
 // module Space =
