@@ -2,12 +2,7 @@ namespace TicTacToe
 
 open TicTacToe
 
-type public TurnState(playerOne: Player, playerTwo :Player) = class
+module TurnState =
 
-    let playerOne = playerOne
-    let playerTwo = playerTwo
-
-    member x.PlayerOne = playerOne
-    member x.PlayerTwo = playerTwo
-
-end
+    let Nothing =
+        printf "Nothing"

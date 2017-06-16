@@ -26,6 +26,3 @@ module Board =
 
     let printInvalidCharacter player =
         printf "Last entry was invalid, player: %s please try again." player
-
-    let getInput =
-        System.Console.ReadLine

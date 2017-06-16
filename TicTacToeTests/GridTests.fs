@@ -147,4 +147,9 @@ namespace TicTacToeTests
             grid.MarkSpace 1 'x'
             (grid.GetSpace 1).Mark |> should equal 'x'
             
+        [<Test>]
+        let ``Grid GetMarkPerSpace Gets mark for Indicated Space`` () =
+            let grid = new Grid()
+            grid.MarkSpace 1 'x'
+            (grid.GetMark 1) |> should equal 'x'
 

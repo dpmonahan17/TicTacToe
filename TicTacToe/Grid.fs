@@ -58,4 +58,7 @@ type public Grid() = class
     member x.MarkSpace id mark =
         (x.GetSpace id).SetMark mark
 
+    member x.GetMark id =
+        (x.GetSpace id).Mark
+
 end
