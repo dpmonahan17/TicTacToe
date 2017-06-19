@@ -52,12 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameTests.fs" />
-    <Compile Include="PlayerTests.fs" />
-    <Compile Include="GridTests.fs" />
-    <Compile Include="BoardTests.fs" />
-    <Compile Include="ScorerTests.fs" />
-    <Compile Include="SpaceTests.fs" />
-    <Compile Include="TurnStateTests.fs" />
     <None Include="App.config" />
     <Compile Include="Program.fs" />
   </ItemGroup>

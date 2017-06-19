@@ -15,8 +15,6 @@ type GridRow = Left | Middle | Right
 type GridColumn = Top | Center | Bottom
 type GridPosition = GridRow * GridColumn
 
-type GridStatus = Filled | NotFilled
-
 type Space = {
     Position : GridPosition
     Marked : Mark
@@ -41,126 +39,137 @@ type IBoardState =
     | OTurn of BoardData
     | Completed of GameResultsData
 
+type IGameControls = 
+    abstract member PrintGameResults : results:GameResult -> player:Player -> unit
+    abstract member GetTurn : grid:Grid -> player:Player -> Grid
 
-type IGameControls() = class
-
-    static member PrintCurrentGrid grid =
+type public GameControls() = class
+    let PrintCurrentGrid grid =
         printf "grid"
 
-    static member PrintPlayerOptions grid =
+    let PrintPlayerOptions grid =
         printf "options"
 
-    static member GetPlayerInput grid player =
+    let GetPlayerInput (grid:Grid) player =
         printf "get Player input"
         //IGameUtilities.updateBoard
         grid
 
+    
+    interface IGameControls with
+    
     member x.PrintGameResults (results:GameResult) (player:Player) =
         match results with
         | Win -> printf "Player %s has won!" player.name
         | Tie -> printf "Game has ended in a tie"
 
-    static member GetTurn grid player=
-        IGameControls.PrintCurrentGrid grid
-        IGameControls.PrintPlayerOptions grid
-        IGameControls.GetPlayerInput grid player
+    member x.GetTurn grid player=
+        PrintCurrentGrid grid
+        PrintPlayerOptions grid
+        GetPlayerInput grid player
 
 end
 
-type IGameUtilities() = class
+type IGameUtilities =
+    abstract member CheckForTie : grid:Grid -> bool
+    abstract member CheckForWin : grid:Grid -> bool
+    abstract member BuildBlankBoard : Grid
 
-    let UpdateGrid (grid:Grid) player selection =
+
+type public GameUtilities() = class
+
+    member x.UpdateGrid (grid:Grid) player selection =
         grid.grid |> List.find(fun i -> i.Position = selection)
-
-
-    let CheckForTie (grid:Grid) =
-        false
-
-    let CheckForWin (grid:Grid) =
-        false
-    let hasThreeInARow spaces = 
+           
+    member x.hasThreeInARow (spaces:List<Space>) = 
         No
 
-    let updateBoard spaces =
-        {grid = spaces} //Circular Reference Need to implement check against spaces and use real check everytime, don't store in flags.
+    member x.updateBoard (spaces:List<Space>) =
+        {grid = spaces} : Grid //Circular Reference Need to implement check against spaces and use real check everytime, don't store in flags.
 
-    let buildBlankBoard =
-        let spaces = [
-            {Position = (Left, Top); Marked = No};
-            {Position = (Left, Center); Marked = No};
-            {Position = (Left, Bottom); Marked = No};
-            {Position = (Middle, Top); Marked = No};
-            {Position = (Middle, Center); Marked = No};
-            {Position = (Middle, Bottom); Marked = No};
-            {Position = (Right, Top); Marked = No};
-            {Position = (Right, Center); Marked = No};
-            {Position = (Right, Bottom); Marked = No};
-        ]
-        {grid = spaces}
+
+    interface IGameUtilities with
+        member x.CheckForTie (grid:Grid) =
+            false
+        member x.CheckForWin (grid:Grid) =
+            false
+        member x.BuildBlankBoard =
+            let spaces = [
+                {Position = (Left, Top); Marked = No};
+                {Position = (Left, Center); Marked = No};
+                {Position = (Left, Bottom); Marked = No};
+                {Position = (Middle, Top); Marked = No};
+                {Position = (Middle, Center); Marked = No};
+                {Position = (Middle, Bottom); Marked = No};
+                {Position = (Right, Top); Marked = No};
+                {Position = (Right, Center); Marked = No};
+                {Position = (Right, Bottom); Marked = No};
+            ]
+            {grid = spaces} :Grid
 
 end
 
-type Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
+type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
 
     member x.gameControls = gameControls
     member x.gameUtilities = gameUtils
 
-    static member printResults board =
+    member x.printResults board =
         match board with
         | XTurn _ ->
             board
         | OTurn _ ->
             board
         | Completed {player=player; result=result} ->
-            gameControls  PrintGameResults result player
+            x.gameControls.PrintGameResults result player
             board
         
 
-    static member checkForTie board =
+    member x.checkForTie board =
         match board with 
         | XTurn {grid=xGrid; players=players} ->
-            if IGameUtilities.CheckForTie xGrid 
+            if x.gameUtilities.CheckForTie xGrid 
             then Completed {result = Tie; player = players.PlayerX}
             else board
         | OTurn {grid=oGrid; players=players} ->
-            if IGameUtilities.CheckForTie oGrid 
+            if x.gameUtilities.CheckForTie oGrid 
             then Completed {result = Tie; player = players.PlayerO}
             else board
         | Completed _ ->
             board
         
-    static member checkForWin board =
+    member x.checkForWin board =
         match board with 
         | XTurn {grid=xGrid; players=players} ->
-            if IGameUtilities.CheckForWin xGrid 
+            if x.gameUtilities.CheckForWin xGrid 
             then Completed {result = Win; player = players.PlayerX}
             else board
         | OTurn {grid=oGrid; players=players} ->
-            if IGameUtilities.CheckForWin oGrid 
+            if x.gameUtilities.CheckForWin oGrid 
             then Completed {result = Win; player = players.PlayerO}
             else board
         | Completed _ ->
             board
 
-    static member performTurn board =
+    member x.performTurn board =
         match board with
         | XTurn {grid=xGrid; players=players} ->
-            XTurn {grid = IGameControls.GetTurn xGrid players.PlayerX; players = players}
+            XTurn {grid = x.gameControls.GetTurn xGrid players.PlayerX; players = players}
         | OTurn {grid=oGrid; players=players} ->
-            OTurn {grid = IGameControls.GetTurn oGrid players.PlayerO; players = players}
+            OTurn {grid = x.gameControls.GetTurn oGrid players.PlayerO; players = players}
         | Completed _ ->
             board
 
-    static member nextTurn board =
+    member x.nextTurn board =
         match board with
         | XTurn {grid=xGrid; players=players} ->
-            board |> Game.performTurn |> Game.checkForWin |> Game.checkForTie |> Game.nextTurn
+            board |> x.performTurn |> x.checkForWin |> x.checkForTie |> x.nextTurn
         | OTurn {grid=oGrid; players=players} ->
-            board |> Game.performTurn |> Game.checkForWin |> Game.checkForTie |> Game.nextTurn
+            board |> x.performTurn |> x.checkForWin |> x.checkForTie |> x.nextTurn
         | Completed _ ->
-            board |> Game.printResults
+            board |> x.printResults
 
-    static member start() =
+    member x.start() =
         printf "started"
 
 end

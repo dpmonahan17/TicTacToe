@@ -37,12 +37,6 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Space.fs" />
-    <Compile Include="Board.fs" />
-    <Compile Include="Scorer.fs" />
-    <Compile Include="Grid.fs" />
-    <Compile Include="Player.fs" />
-    <Compile Include="TurnState.fs" />
     <Compile Include="Game.fs" />
     <None Include="Script.fsx" />
     <Compile Include="Program.fs" />
