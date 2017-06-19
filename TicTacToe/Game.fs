@@ -39,6 +39,7 @@ type IBoardState =
     | OTurn of BoardData
     | Completed of GameResultsData
 
+
 type IGameControls = 
     abstract member PrintGameResults : results:GameResult -> player:Player -> unit
     abstract member GetTurn : grid:Grid -> player:Player -> Grid
@@ -74,9 +75,10 @@ type IGameUtilities =
     abstract member CheckForTie : grid:Grid -> bool
     abstract member CheckForWin : grid:Grid -> bool
     abstract member BuildBlankBoard : Grid
+    abstract member GetPossibleMoves : grid:Grid -> Grid
 
 
-type public GameUtilities() = class
+type GameUtilities() = class
 
     member x.UpdateGrid (grid:Grid) player selection =
         grid.grid |> List.find(fun i -> i.Position = selection)
@@ -87,8 +89,12 @@ type public GameUtilities() = class
     member x.updateBoard (spaces:List<Space>) =
         {grid = spaces} : Grid //Circular Reference Need to implement check against spaces and use real check everytime, don't store in flags.
 
-
     interface IGameUtilities with
+  
+        member x.GetPossibleMoves (grid:Grid) : Grid =
+            let newGrid :List<Space> = 
+                grid.grid |> List.filter(fun i -> i.Marked = No)
+            {grid = newGrid} : Grid
         member x.CheckForTie (grid:Grid) =
             false
         member x.CheckForWin (grid:Grid) =
@@ -107,6 +113,29 @@ type public GameUtilities() = class
             ]
             {grid = spaces} :Grid
 
+
+end
+
+type IGameScorer = 
+    abstract member getBestMove : grid:Grid -> Grid
+
+type GameScorer(gameUtils : IGameUtilities) = class
+    member x.GameUtilities = gameUtils
+    
+    interface IGameScorer with
+        member x.getBestMove (grid:Grid) =
+            let moves = x.GameUtilities.GetPossibleMoves grid
+            grid
+
+
+end
+
+type ComputerPlayer(gameScorer:IGameScorer) = class
+
+    member x.GameScorer = gameScorer
+
+
+
 end
 
 type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
@@ -123,9 +152,8 @@ type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
         | Completed {player=player; result=result} ->
             x.gameControls.PrintGameResults result player
             board
-        
-
-    member x.checkForTie board =
+      
+    member x.CheckForTie board =
         match board with 
         | XTurn {grid=xGrid; players=players} ->
             if x.gameUtilities.CheckForTie xGrid 
@@ -138,7 +166,7 @@ type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
         | Completed _ ->
             board
         
-    member x.checkForWin board =
+    member x.CheckForWin board =
         match board with 
         | XTurn {grid=xGrid; players=players} ->
             if x.gameUtilities.CheckForWin xGrid 
@@ -151,7 +179,7 @@ type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
         | Completed _ ->
             board
 
-    member x.performTurn board =
+    member x.PerformTurn board =
         match board with
         | XTurn {grid=xGrid; players=players} ->
             XTurn {grid = x.gameControls.GetTurn xGrid players.PlayerX; players = players}
@@ -163,9 +191,9 @@ type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
     member x.nextTurn board =
         match board with
         | XTurn {grid=xGrid; players=players} ->
-            board |> x.performTurn |> x.checkForWin |> x.checkForTie |> x.nextTurn
+            board |> x.PerformTurn |> x.CheckForWin |> x.CheckForTie |> x.nextTurn
         | OTurn {grid=oGrid; players=players} ->
-            board |> x.performTurn |> x.checkForWin |> x.checkForTie |> x.nextTurn
+            board |> x.PerformTurn |> x.CheckForWin |> x.CheckForTie |> x.nextTurn
         | Completed _ ->
             board |> x.printResults
 
