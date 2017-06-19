@@ -42,30 +42,32 @@ type IBoardState =
     | Completed of GameResultsData
 
 
-module IGameControls =
+type IGameControls() = class
 
-    let PrintCurrentGrid grid =
+    static member PrintCurrentGrid grid =
         printf "grid"
 
-    let PrintPlayerOptions grid =
+    static member PrintPlayerOptions grid =
         printf "options"
 
-    let GetPlayerInput grid player =
+    static member GetPlayerInput grid player =
         printf "get Player input"
-        //IGameUtilities.updateBoa
+        //IGameUtilities.updateBoard
         grid
 
-    let PrintGameResults (results:GameResult) (player:Player) =
+    member x.PrintGameResults (results:GameResult) (player:Player) =
         match results with
         | Win -> printf "Player %s has won!" player.name
         | Tie -> printf "Game has ended in a tie"
 
-    let GetTurn grid player=
-        PrintCurrentGrid grid
-        PrintPlayerOptions grid
-        GetPlayerInput grid player
+    static member GetTurn grid player=
+        IGameControls.PrintCurrentGrid grid
+        IGameControls.PrintPlayerOptions grid
+        IGameControls.GetPlayerInput grid player
 
-module IGameUtilities =
+end
+
+type IGameUtilities() = class
 
     let UpdateGrid (grid:Grid) player selection =
         grid.grid |> List.find(fun i -> i.Position = selection)
@@ -94,23 +96,27 @@ module IGameUtilities =
             {Position = (Right, Center); Marked = No};
             {Position = (Right, Bottom); Marked = No};
         ]
-        {grid = spaces; completedRow = No; fillStatus = NotFilled}
+        {grid = spaces}
 
+end
 
-module Game =
+type Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
 
-    let printResults board =
+    member x.gameControls = gameControls
+    member x.gameUtilities = gameUtils
+
+    static member printResults board =
         match board with
         | XTurn _ ->
             board
         | OTurn _ ->
             board
         | Completed {player=player; result=result} ->
-            IGameControls.PrintGameResults result player
+            gameControls  PrintGameResults result player
             board
         
 
-    let checkForTie board =
+    static member checkForTie board =
         match board with 
         | XTurn {grid=xGrid; players=players} ->
             if IGameUtilities.CheckForTie xGrid 
@@ -123,7 +129,7 @@ module Game =
         | Completed _ ->
             board
         
-    let checkForWin board =
+    static member checkForWin board =
         match board with 
         | XTurn {grid=xGrid; players=players} ->
             if IGameUtilities.CheckForWin xGrid 
@@ -136,7 +142,7 @@ module Game =
         | Completed _ ->
             board
 
-    let performTurn board =
+    static member performTurn board =
         match board with
         | XTurn {grid=xGrid; players=players} ->
             XTurn {grid = IGameControls.GetTurn xGrid players.PlayerX; players = players}
@@ -145,17 +151,19 @@ module Game =
         | Completed _ ->
             board
 
-    let rec nextTurn board =
+    static member nextTurn board =
         match board with
         | XTurn {grid=xGrid; players=players} ->
-            board |> performTurn |> checkForWin |> checkForTie |> nextTurn
+            board |> Game.performTurn |> Game.checkForWin |> Game.checkForTie |> Game.nextTurn
         | OTurn {grid=oGrid; players=players} ->
-            board |> performTurn |> checkForWin |> checkForTie |> nextTurn
+            board |> Game.performTurn |> Game.checkForWin |> Game.checkForTie |> Game.nextTurn
         | Completed _ ->
-            board |> printResults
+            board |> Game.printResults
 
-    let start() =
+    static member start() =
         printf "started"
+
+end
 
 
 module Program =
