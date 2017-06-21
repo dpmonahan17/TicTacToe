@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Name>TicTacToeTests</Name>
@@ -39,19 +39,23 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="net40\Foq.Usage.fsx">
-      <Paket>True</Paket>
-    </Content>
-    <Content Include="net45\Foq.Usage.fsx">
-      <Paket>True</Paket>
-    </Content>
     <ProjectReference Include="..\TicTacToe\TicTacToe.fsproj">
       <Name>TicTacToe.fsproj</Name>
       <Project>{4c079972-440d-42c5-bdd6-629137bbb075}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="net40/Foq.Usage.fsx">
+      <Paket>True</Paket>
+    </Content>
+    <Content Include="net45/Foq.Usage.fsx">
+      <Paket>True</Paket>
+    </Content>
+    <Compile Include="Fakes.fs" />
     <Compile Include="GameTests.fs" />
+    <Compile Include="ComputerPlayerTests.fs" />
+    <Compile Include="GameUtilityTests.fs" />
+    <Compile Include="GameControlsTests.fs" />
     <None Include="App.config" />
     <Compile Include="Program.fs" />
   </ItemGroup>
