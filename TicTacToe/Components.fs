@@ -24,17 +24,6 @@ type Grid = {
     grid: Space List
 }
 
-type MoveData = {
-    grid : Grid
-    move : Space
-    score : int
-    depth : int
-}
-
-type ScoringState = 
-    | NextMove of MoveData
-    | EndMove of MoveData
-
 type BoardData = {
     grid : Grid
     players : Players

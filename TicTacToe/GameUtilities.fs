@@ -4,19 +4,19 @@ type IGameUtilities =
     abstract member CheckForTie : grid:Grid -> bool
     abstract member CheckForWin : grid:Grid -> bool
     abstract member BuildBlankBoard : Grid
-    abstract member GetPossibleMoves : grid:Grid -> Grid
+    abstract member GetPossibleMoves : grid:Grid -> Space List
     abstract member GetSpace : grid:Grid -> position:GridPosition -> Space
     abstract member GetRow : grid:Grid -> index:int -> Space List
     abstract member CheckForXWin : grid:Grid -> bool
     abstract member CheckForOWin : grid:Grid -> bool
     abstract member UpdateGrid : grid:Grid -> selection:Space -> Grid
-
+    abstract member MarkMove : move:Space -> player:Player -> Space
 
 type public GameUtilities() = class
 
     member x.UpdateGrid (grid:Grid) (selection:Space) =
         (x :> IGameUtilities).UpdateGrid grid selection
-    member x.GetPossibleMoves (grid:Grid) : Grid =
+    member x.GetPossibleMoves (grid:Grid) : Space List =
         (x :> IGameUtilities).GetPossibleMoves grid
         
     member x.GetSpace (grid:Grid) (position:GridPosition) =
@@ -46,6 +46,9 @@ type public GameUtilities() = class
 
     member x.CheckForWin (grid:Grid) =
         (x :> IGameUtilities).CheckForWin grid
+
+    member x.MarkMove move player =
+        (x :> IGameUtilities).MarkMove move player
 
     interface IGameUtilities with
         
@@ -96,7 +99,7 @@ type public GameUtilities() = class
         member x.GetPossibleMoves (grid:Grid) = 
             let newGrid :List<Space> = 
                 grid.grid |> List.filter(fun i -> i.Marked = No)
-            {grid = newGrid} : Grid
+            newGrid
         member x.BuildBlankBoard =
             let spaces = [
                 {Position = (Left, Top); Marked = No};
@@ -110,5 +113,8 @@ type public GameUtilities() = class
                 {Position = (Right, Bottom); Marked = No};
             ]
             {grid = spaces} :Grid
+
+        member x.MarkMove move player =
+            {Position = move.Position; Marked = player.Mark}
         
 end

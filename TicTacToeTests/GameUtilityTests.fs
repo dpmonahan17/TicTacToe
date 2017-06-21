@@ -40,11 +40,11 @@ module GameUtilityTests =
     [<Test>]
     let ``GetPossibleMoves returns grid of valid spaces`` () =
         let utilities = GameUtilities()
-        let newGrid : Grid = utilities.GetPossibleMoves FakeSetup.testBoard
+        let newGrid : Space List = utilities.GetPossibleMoves FakeSetup.testBoard
         
-        newGrid.grid.Length |> should equal 2
-        (newGrid.grid |> List.find(fun i -> i.Position = (Left, Top))).Marked |> should equal No
-        (newGrid.grid |> List.find(fun i -> i.Position = (Left, Center))).Marked |> should equal No
+        newGrid.Length |> should equal 2
+        (newGrid |> List.find(fun i -> i.Position = (Left, Top))).Marked |> should equal No
+        (newGrid |> List.find(fun i -> i.Position = (Left, Center))).Marked |> should equal No
 
     [<Test>]
     let ``GetSpace returns specific space`` () =

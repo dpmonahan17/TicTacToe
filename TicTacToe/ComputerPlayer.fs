@@ -1,76 +1,101 @@
 namespace TicTacToe
 
-type IComputerPlayer = 
-    abstract member GetBestMove : grid:Grid -> Grid
-    abstract member GetMoveScore : grid:Grid -> move:Space -> int
+type MoveData = {
+    grid : Grid
+    moves : Space List
+    player : Player
+    score : int
+    depth : int
+}
 
-type ComputerPlayer(gameUtils : IGameUtilities) = class
+type ScoringState =
+| NextMove of MoveData
+| FinalMove of MoveData
+| BestMove of Space
+
+type IAlgorithm = 
+    abstract member GetBestScore : grid:Grid -> player:Player -> depth:int -> maximizingPlayer:bool -> int
+
+type Algorithm(gameUtils : IGameUtilities) = class
+
+    member x.gameUtils = gameUtils
+    
+    member x.GetOppenent (player:Player) =
+        match player.Mark with
+        | X -> {Name = "o"; Mark = O}
+        | O -> {Name = "x"; Mark = X}
+
+    member x.GetScore (grid:Grid) (player:Player) (depth:int) : int =
+        match player.Mark with
+        | X -> 
+            if x.gameUtils.CheckForXWin grid then 10 - depth
+            else if x.gameUtils.CheckForOWin grid then -10 + depth
+            else 0
+        | O -> 
+            if x.gameUtils.CheckForXWin grid then -10 + depth
+            else if x.gameUtils.CheckForOWin grid then 10 - depth
+            else 0
+
+    member x.GetBestScore (grid:Grid) (player:Player) (depth:int) (maximizingPlayer:bool) =
+        (x :> IAlgorithm).GetBestScore (grid:Grid) (player:Player) (depth:int) (maximizingPlayer:bool)
+
+    member x.Max (grid:Grid) (player:Player) (depth:int) =
+        let bestScore = -1000
+        let maxScore = 
+            (x.gameUtils.GetPossibleMoves grid) |> List.map(fun move ->
+                x.GetBestScore (x.gameUtils.UpdateGrid grid (x.gameUtils.MarkMove move player)) player (depth + 1) false) |> List.max
+        printf "Max Move Score = %i and depth is = %i\n" maxScore depth
+        printf "Current Player is %s\n" player.Name
+        max bestScore maxScore
+    member x.Min(grid:Grid) (player:Player) (depth:int)= 
+        let bestScore = 1000
+        let minScore = 
+            (x.gameUtils.GetPossibleMoves grid) |> List.map(fun move ->
+                x.GetBestScore (x.gameUtils.UpdateGrid grid (x.gameUtils.MarkMove move player)) player (depth + 1) true) |> List.min
+        printf "Min Move Score = %i and depth is = %i\n" minScore depth
+        printf "Current Player is %s\n" player.Name
+        min bestScore minScore
+
+    interface IAlgorithm with
+
+        member x.GetBestScore (grid:Grid) (player:Player) (depth:int) (currentPlayer:bool) =
+            if x.gameUtils.CheckForWin grid || x.gameUtils.CheckForTie grid then
+                x.GetScore grid player depth
+            else
+                match currentPlayer with
+                | true -> x.Max grid player depth
+                | false -> x.Min grid (x.GetOppenent player) depth
+            
+end
+
+
+
+type IComputerPlayer = 
+    abstract member GetNextMove : grid:Grid -> player:Player -> Space
+
+type ComputerPlayer(gameUtils : IGameUtilities, algorithm : IAlgorithm) = class
     
     member x.GameUtilities = gameUtils
+    member x.Calc = algorithm
 
-    member x.GetMoveScore (grid:Grid) (move:Space) =
-        (x :> IComputerPlayer).GetMoveScore grid move
-    
-    member x.GetBestMove (grid:Grid) :Grid =
-        (x :> IComputerPlayer).GetBestMove grid
+    member x.GetNextMove (grid:Grid) (player:Player) =
+        (x :> IComputerPlayer).GetNextMove grid player
 
-    member x.GetAllMovesScores (grid:Grid) (moves:Grid) =
-        moves.grid |> List.map(fun i -> ((x.GetMoveScore grid i), i))
+    member x.GetMoveScore grid move player=
+        let currentGrid = x.GameUtilities.UpdateGrid grid move
+        let score = x.Calc.GetBestScore currentGrid player 0 true
+        printf "Final Move Score is: %i\n" score
+        score
 
-    member x.CheckTie MoveState =
-        match MoveState with
-        | NextMove {grid = grid; move = move; score = score; depth = depth} -> 
-            if x.GameUtilities.CheckForTie grid
-            then EndMove {grid = grid; move = move; score = (0 + depth); depth = depth}
-            else MoveState
-        | _ -> MoveState
-
-    member x.CheckO MoveState = 
-        match MoveState with
-        | _ -> MoveState
-
-    member x.CheckX MoveState =
-        match MoveState with
-        | _ -> MoveState
-
-    member x.ToggleMove (move:Space) =
-        match move.Marked with
-        | X -> {Position = move.Position; Marked = O}
-        | O -> {Position = move.Position; Marked = X}
-        | _ -> {Position = move.Position; Marked = X}
-
-    member x.IncrementDepth (depth:int) = 
-        depth + 1
-
-    member x.PerformMove MoveState =
-        match MoveState with
-        | NextMove {grid = grid; move = move; score = score; depth = depth} -> 
-            x.GameUtilities.UpdateGrid grid move
-            x.GameUtilities.GetPossibleMoves grid
-            NextMove {grid = grid; move = x.ToggleMove move; score = score; depth = x.IncrementDepth depth}
-        | _ -> MoveState
-
-    member x.NextMove (MoveState:ScoringState) :ScoringState =
-        match MoveState with
-        | NextMove {grid = grid; move = move; score = score; depth = depth} ->  
-            MoveState |> x.CheckTie |> x.CheckO |> x.CheckX |> x.PerformMove |> x.NextMove
-        | _ -> MoveState
 
     interface IComputerPlayer with
-        member x.GetBestMove (grid:Grid) =
-            let moves = x.GameUtilities.GetPossibleMoves grid
-            let scores = x.GetAllMovesScores grid moves
-            let bestMove = scores |> List.minBy(fun (x,y) -> x)
-            let space = 
-                match bestMove with
-                | (x,y) -> y
-            x.GameUtilities.UpdateGrid grid space
 
-         member x.GetMoveScore (grid:Grid) (move:Space) =
-            let finalState = x.NextMove (NextMove {grid = grid; move = move; score = 0; depth = 0})
-            match finalState with
-            | EndMove {grid = grid; move = move; score = score; depth = depth}
-                -> score
-            | _ -> 0
+        member x.GetNextMove (grid:Grid) (player:Player) =
+            let possibleMoves = x.GameUtilities.GetPossibleMoves grid
+            let scoreList = possibleMoves |> List.map(fun i -> ((x.GetMoveScore grid i player), i))
+            let bestMove = scoreList |> List.minBy(fun (x,y) -> x)
+            let space = match bestMove with 
+                        | (a,b) -> x.GameUtilities.MarkMove b player
+            space
 
 end

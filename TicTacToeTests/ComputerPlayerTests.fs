@@ -7,74 +7,72 @@ namespace TicTacToeTests
 
         open TicTacToe
 
-        // [<Test>]
-        // let ``GetMoveScore returns -10 if move wins`` () =
-        //     let fakeUtils = fakeGameUtilities((false:bool), (false:bool))
-        //     let pcPlayer = ComputerPlayer(fakeUtils)
-        //     let grid = FakeSetup.testBoard
-        //     let move = {Position = (Left, Top); Marked = X}
+        [<Test>]
+        let ``ComputerPlayer has method to get next move depending on grid`` () =
+            let fakeUtils = GameUtilities()
+            let pcPlayer = ComputerPlayer(fakeUtils, Algorithm(GameUtilities()))
+            let board = FakeSetup.testBoard
+            let player = {Name = "John Did"; Mark = X}
+            let nextMove : Space= pcPlayer.GetNextMove (board:Grid) (player:Player)
+            match nextMove.Marked with
+            | X -> printf "Mark is X\n"
+            | O -> printf "Mark is O\n"
+            | No -> printf "Mark is No\n"
+
+            nextMove.Marked |> should equal X
             
-        //     let result = pcPlayer.GetMoveScore grid move
 
-        //     result |> should equal -10
+        [<Test>]
+        let ``ComputerPlayer GetNextMove marks space based on player`` () =
+            let fakeUtils = GameUtilities()
+            let pcPlayer = ComputerPlayer(fakeUtils, Algorithm(GameUtilities()))
+            let board = FakeSetup.testBoard
+            let player = {Name = "John Did"; Mark = O}
+            let nextMove : Space = pcPlayer.GetNextMove (board:Grid) (player:Player)
+            match nextMove.Marked with
+            | X -> printf "Mark is X\n"
+            | O -> printf "Mark is O\n"
+            | No -> printf "Mark is No\n"
+            
+            nextMove.Marked |> should equal O
+            
 
-        // [<Test>]
-        // let ``CheckTie returns NextMove if board is not full`` () =
-        //     let fakeUtils = fakeGameUtilities((false:bool),(false:bool))
-        //     let pcPlayer = ComputerPlayer(fakeUtils)
-        //     let moveData = NextMove {grid = FakeSetup.testBoard;
-        //                     move = {Position = (Left, Top); Marked = X};
-        //                     score = 0;
-        //                     depth = 0}
-        //     let nextState = pcPlayer.CheckTie moveData
-        //     let result = 
-        //         match nextState with
-        //         | NextMove {grid=grid; move=move; score=score; depth=depth}
-        //             -> true
-        //         | _ 
-        //             -> false
-        //     result |> should equal true
+        [<Test>]
+        let ``ComputerPlayer GetNextMove gets possible moves`` () =
+            let fakeUtils = fakeGameUtilities((false:bool),(false:bool))
+            let pcPlayer = ComputerPlayer(fakeUtils, fakeAlgorithm(fakeUtils))
+            let board = FakeSetup.testBoard
+            let player = {Name = "John Did"; Mark = O}
+            let nextMove : Space= pcPlayer.GetNextMove (board:Grid) (player:Player)
 
-        // [<Test>]
-        // let ``NextMove returns EndMove if board is full`` () =
-        //     let fakeUtils = fakeGameUtilities((true:bool),(false:bool))
-        //     let pcPlayer = ComputerPlayer(fakeUtils)
-        //     let moveData = NextMove {grid = FakeSetup.fullBoard;
-        //                     move = {Position = (Left, Top); Marked = X};
-        //                     score = 0;
-        //                     depth = 0}
-        //     let nextState = pcPlayer.CheckTie moveData
-        //     let result = 
-        //         match nextState with
-        //         | EndMove {grid=grid; move=move; score=score; depth=depth}
-        //             -> true
-        //         | _ 
-        //             -> false
-        //     result |> should equal true
+            fakeUtils.PossibleMovesCallCount.Value > 0 |> should equal true
 
-        // [<Test>]
-        // let ``Scorer can get the best move`` () =
-        //     let fakeUtils = fakeGameUtilities((false:bool),(false:bool))
-        //     let pcPlayer = ComputerPlayer(fakeUtils)
-        //     let grid = testBoard
-        //     (grid.grid |> List.find(fun i -> i.Position = (Left, Top))).Marked |> should equal No
-        //     let result = pcPlayer.GetBestMove grid
-        //     (result.grid |> List.find(fun i -> i.Position = (Left, Top))).Marked |> should equal X
+        [<Test>]
+        let ``ComputerPlayer GetNextMove marks even if no way to win`` () =
+            let fakeUtils = GameUtilities()
+            let pcPlayer = ComputerPlayer(fakeUtils, Algorithm(GameUtilities()))
+            let board = FakeSetup.losingBoard
+            let player = {Name = "John Did"; Mark = O}
+            let nextMove : Space = pcPlayer.GetNextMove (board:Grid) (player:Player)
+            match nextMove.Marked with
+            | X -> printf "Mark is X\n"
+            | O -> printf "Mark is O\n"
+            | No -> printf "Mark is No\n"
+            
+            nextMove.Marked |> should equal O
+            nextMove.Position |> should equal (Right,Center)
 
-
-        // [<Test>]
-        // let ``NextMove returns TieMove if board is full`` () =
-        //     let fakeUtils = fakeGameUtilities((true:bool),(false:bool))
-        //     let pcPlayer = ComputerPlayer(fakeUtils)
-        //     let moveData = NextMove {grid = FakeSetup.fullBoard;
-        //                     move = {Position = (Left, Top); Marked = X};
-        //                     score = 0;
-        //                     depth = 0}
-        //     let nextState = pcPlayer.NextMove moveData
-        //     let result = 
-        //         match nextState with
-        //         | TieMove {grid=grid; move=move; score=score; depth=depth}
-        //             -> true
-        //         | _ 
-        //             -> false
-        //     result |> should equal true
+        [<Test>]
+        let ``ComputerPlayer GetNextMove marks left center to block`` () =
+            let fakeUtils = GameUtilities()
+            let pcPlayer = ComputerPlayer(fakeUtils, Algorithm(GameUtilities()))
+            let board = FakeSetup.needBlockBoard
+            let player = {Name = "John Did"; Mark = O}
+            let nextMove : Space = pcPlayer.GetNextMove (board:Grid) (player:Player)
+            match nextMove.Marked with
+            | X -> printf "Mark is X\n"
+            | O -> printf "Mark is O\n"
+            | No -> printf "Mark is No\n"
+                        
+            nextMove.Marked |> should equal O
+            nextMove.Position |> should equal (Left,Center)

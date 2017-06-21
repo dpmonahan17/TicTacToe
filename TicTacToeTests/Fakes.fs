@@ -5,14 +5,26 @@ open FsUnit
 
 open TicTacToe
 
+type fakeAlgorithm(gameUtil : IGameUtilities) = class
+
+    member x.gameUtil = gameUtil
+
+    interface IAlgorithm with
+        member x.GetBestScore (grid:Grid) (player:Player) (depth:int) (maximizingPlayer:bool) =
+            10
+
+end
+
 type fakeGameUtilities(tieResult:bool, winResult:bool) = class
     let mutable tieCallCount = ref 0
     let mutable winCallCount = ref 0
+    let mutable possibleMovesCallCount = ref 0
     let mutable tieResult = tieResult
     let mutable winResult = winResult
     
     member x.TieCallCount:int ref = tieCallCount
     member x.WinCallCount:int ref = winCallCount
+    member x.PossibleMovesCallCount = possibleMovesCallCount
     member x.TieResult:bool = tieResult            
     member x.WinResult:bool = winResult
 
@@ -53,12 +65,13 @@ type fakeGameUtilities(tieResult:bool, winResult:bool) = class
             false
 
         member x.GetPossibleMoves (grid:Grid) =
-            let grid2:Grid =
-                {grid = 
-                    [{Position = (Left, Top); Marked = No};
-                    {Position = (Left, Center); Marked = X}]
-                }
-            grid2
+            incr possibleMovesCallCount
+            [{Position = (Left, Top); Marked = No};
+            {Position = (Left, Center); Marked = X}]
+        
+        member x.MarkMove (move:Space) (player:Player) =
+            move
+
 end
 
 type fakeGameControls() = class
@@ -115,4 +128,30 @@ module FakeSetup =
             {Position = (Right, Top); Marked = O};
             {Position = (Right, Center); Marked = O};
             {Position = (Right, Bottom); Marked = X};
+        ]}
+
+    let losingBoard : Grid =
+        {grid = [
+            {Position = (Left, Top); Marked = X};
+            {Position = (Left, Center); Marked = X};
+            {Position = (Left, Bottom); Marked = O};
+            {Position = (Middle, Top); Marked = O};
+            {Position = (Middle, Center); Marked = O};
+            {Position = (Middle, Bottom); Marked = X};
+            {Position = (Right, Top); Marked = X};
+            {Position = (Right, Center); Marked = No};
+            {Position = (Right, Bottom); Marked = No};
+        ]}
+
+    let needBlockBoard : Grid =
+        {grid = [
+            {Position = (Left, Top); Marked = X};
+            {Position = (Left, Center); Marked = No};
+            {Position = (Left, Bottom); Marked = X};
+            {Position = (Middle, Top); Marked = O};
+            {Position = (Middle, Center); Marked = No};
+            {Position = (Middle, Bottom); Marked = No};
+            {Position = (Right, Top); Marked = No};
+            {Position = (Right, Center); Marked = No};
+            {Position = (Right, Bottom); Marked = No};
         ]}
