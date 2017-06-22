@@ -26,13 +26,13 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game should print game end results if game is completed`` () =
-            let fake = fakeGameControls()
+            let fake = FakeGameControls()
             let utilities = GameUtilities()
             let game = Game(fake, utilities)                    
             let board = 
-                Completed {player = {Name = "John Doe"; Mark = X}; result = Win }
+                Completed {grid = FakeSetup.testBoard; player = {Name = "John Doe"; Mark = X}; result = Win }
             
-            let result = board |> game.printResults 
+            let result = board |> game.PrintResults 
             match result with
             | Completed {player=player; result=resultData} -> result |> should equal board
             | _ -> result |> should equal board
@@ -41,12 +41,12 @@ namespace TicTacToeTests
         
         [<Test>]
         let ``Game should not print end game results if its X's turn`` () =
-            let fake = fakeGameControls()
+            let fake = FakeGameControls()
             let utilities = GameUtilities()
             let game = Game(fake, utilities)
             let board = buiLdXTurn
             
-            let result = board |> game.printResults 
+            let result = board |> game.PrintResults 
             match result with
             | Completed {player=player; result=resultData} -> resultData |> should equal board
             | _ -> result |> should equal board
@@ -55,12 +55,12 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game should not print end game results if its O's turn`` () =
-            let fake = fakeGameControls()
+            let fake = FakeGameControls()
             let utilities = GameUtilities()
             let game = Game(fake, utilities)
             let board = buiLdOTurn
             
-            let result = board |> game.printResults 
+            let result = board |> game.PrintResults 
             match result with
             | Completed {player=player; result=resultData} -> resultData |> should equal board
             | _ -> result |> should equal board
@@ -69,8 +69,8 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game CheckForTie step should return Completed if X Turn and game is tied`` () =
-            let fakeUtils = fakeGameUtilities((true:bool),(false:bool))
-            let game = Game(fakeGameControls(), fakeUtils)
+            let fakeUtils = FakeGameUtilities((true:bool),(false:bool))
+            let game = Game(FakeGameControls(), fakeUtils)
             let board = buiLdXTurn
             
             let result = board |> game.CheckForTie
@@ -82,8 +82,8 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game CheckForTie step should return original board if game is not tied`` () =
-            let fakeUtils = fakeGameUtilities((false:bool),(false:bool))
-            let game = Game(fakeGameControls(), fakeUtils)
+            let fakeUtils = FakeGameUtilities((false:bool),(false:bool))
+            let game = Game(FakeGameControls(), fakeUtils)
             let board = buiLdOTurn
             
             let result = board |> game.CheckForTie
@@ -95,8 +95,8 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game CheckForWin step should return original board if game is not Won`` () =
-            let fakeUtils = fakeGameUtilities((false:bool),(false:bool))
-            let game = Game(fakeGameControls(), fakeUtils)
+            let fakeUtils = FakeGameUtilities((false:bool),(false:bool))
+            let game = Game(FakeGameControls(), fakeUtils)
             let board = buiLdOTurn
             
             let result = board |> game.CheckForWin
@@ -110,8 +110,8 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game CheckForWin step should return Completed With win and player if game is Won`` () =
-            let fakeUtils = fakeGameUtilities((false:bool),(true:bool))
-            let game = Game(fakeGameControls(), fakeUtils)
+            let fakeUtils = FakeGameUtilities((false:bool),(true:bool))
+            let game = Game(FakeGameControls(), fakeUtils)
             let board = buiLdXTurn
             
             let result = board |> game.CheckForWin
@@ -125,8 +125,8 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game PerformTurn step should return Board with updated Grid if player turn`` () =
-            let fakeUtils = fakeGameUtilities((false:bool),(false:bool))
-            let fakeControls = fakeGameControls()
+            let fakeUtils = FakeGameUtilities((false:bool),(false:bool))
+            let fakeControls = FakeGameControls()
             let game = Game(fakeControls, fakeUtils)
             let board = buiLdXTurn
             
@@ -139,10 +139,10 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game PerformTurn step should return Board if already Completed`` () =
-            let fakeUtils = fakeGameUtilities((false:bool),(false:bool))
-            let fakeControls = fakeGameControls()
+            let fakeUtils = FakeGameUtilities((false:bool),(false:bool))
+            let fakeControls = FakeGameControls()
             let game = Game(fakeControls, fakeUtils)
-            let board = Completed {player = {Name = "John Doe"; Mark = X}; result = Win }
+            let board = Completed {grid = FakeSetup.testBoard; player = {Name = "John Doe"; Mark = X}; result = Win }
             
             let result = board |> game.PerformTurn
             match result with
@@ -153,10 +153,10 @@ namespace TicTacToeTests
 
         [<Test>]
         let ``Game NextTurn step call the other steps`` () =
-            let fakeUtils = fakeGameUtilities((false:bool),(false:bool))
-            let fakeControls = fakeGameControls()
+            let fakeUtils = FakeGameUtilities((false:bool),(false:bool))
+            let fakeControls = FakeGameControls()
             let game = Game(fakeControls, fakeUtils)
-            let board = Completed {player = {Name = "John Doe"; Mark = X}; result = Win }
+            let board = Completed {grid = FakeSetup.testBoard; player = {Name = "John Doe"; Mark = X}; result = Win }
             
             let result = board |> game.PerformTurn
             match result with

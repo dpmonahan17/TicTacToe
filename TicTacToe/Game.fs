@@ -1,30 +1,37 @@
 namespace TicTacToe
 
+open FSharp.Core
 
 type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
 
-    member x.gameControls = gameControls
-    member x.gameUtilities = gameUtils
+    let setupOpponent (player:Player) =
+        match player.Mark with
+        | X -> {Name = "PC Player"; Mark = O}
+        | O -> {Name = "PC Player"; Mark = X}
 
-    member x.printResults board =
+    member x.GameControls = gameControls
+    member x.GameUtilities = gameUtils
+    
+
+    member x.PrintResults board =
         match board with
         | XTurn _ ->
             board
         | OTurn _ ->
             board
-        | Completed {player=player; result=result} ->
-            x.gameControls.PrintGameResults result player
+        | Completed {grid = grid; player=player; result=result} ->
+            x.GameControls.PrintGameResults grid  result player
             board
       
     member x.CheckForTie board =
         match board with 
         | XTurn {grid=xGrid; players=players} ->
-            if x.gameUtilities.CheckForTie xGrid 
-            then Completed {result = Tie; player = players.PlayerX}
+            if x.GameUtilities.CheckForTie xGrid 
+            then Completed {grid = xGrid; result = Tie; player = players.PlayerX}
             else board
         | OTurn {grid=oGrid; players=players} ->
-            if x.gameUtilities.CheckForTie oGrid 
-            then Completed {result = Tie; player = players.PlayerO}
+            if x.GameUtilities.CheckForTie oGrid 
+            then Completed {grid = oGrid; result = Tie; player = players.PlayerO}
             else board
         | Completed _ ->
             board
@@ -32,12 +39,12 @@ type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
     member x.CheckForWin board =
         match board with 
         | XTurn {grid=xGrid; players=players} ->
-            if x.gameUtilities.CheckForWin xGrid 
-            then Completed {result = Win; player = players.PlayerX}
+            if x.GameUtilities.CheckForWin xGrid 
+            then Completed {grid = xGrid; result = Win; player = players.PlayerX}
             else board
         | OTurn {grid=oGrid; players=players} ->
-            if x.gameUtilities.CheckForWin oGrid 
-            then Completed {result = Win; player = players.PlayerO}
+            if x.GameUtilities.CheckForWin oGrid 
+            then Completed {grid = oGrid; result = Win; player = players.PlayerO}
             else board
         | Completed _ ->
             board
@@ -45,29 +52,31 @@ type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
     member x.PerformTurn board =
         match board with
         | XTurn {grid=xGrid; players=players} ->
-            XTurn {grid = x.gameControls.GetTurn xGrid players.PlayerX; players = players}
+            XTurn {grid = x.GameControls.GetTurn xGrid players.PlayerX; players = players}
         | OTurn {grid=oGrid; players=players} ->
-            OTurn {grid = x.gameControls.GetTurn oGrid players.PlayerO; players = players}
+            OTurn {grid = x.GameControls.GetTurn oGrid players.PlayerO; players = players}
         | Completed _ ->
             board
 
-    member x.nextTurn board =
+    member x.NextTurn board =
         match board with
         | XTurn {grid=xGrid; players=players} ->
-            board |> x.PerformTurn |> x.CheckForWin |> x.CheckForTie |> x.nextTurn
+            OTurn {grid = xGrid; players = players}
+                |> x.PerformTurn |> x.CheckForWin |> x.CheckForTie |> x.NextTurn
         | OTurn {grid=oGrid; players=players} ->
-            board |> x.PerformTurn |> x.CheckForWin |> x.CheckForTie |> x.nextTurn
+            XTurn {grid = oGrid; players = players}
+                |> x.PerformTurn |> x.CheckForWin |> x.CheckForTie |> x.NextTurn
         | Completed _ ->
-            board |> x.printResults
+            board |> x.PrintResults
 
-    member x.start() =
-        printf "Test"
+    member x.Start() =
+        let player1 = x.GameControls.GetPlayerData
+        let player2 = setupOpponent player1
+
+        match player1.Mark with
+        | X -> OTurn {grid = x.GameUtilities.BuildBlankBoard; players = {PlayerX = player1; PlayerO = player2}} |> x.NextTurn
+        | O -> XTurn {grid = x.GameUtilities.BuildBlankBoard; players = {PlayerX = player2; PlayerO = player1}} |> x.NextTurn
+
+        x.Start()
 
 end
-
-
-module Program =
-    
-    let main =
-        let game = Game(GameControls(GameUtilities()), GameUtilities())
-        game.start()

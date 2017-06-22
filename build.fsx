@@ -31,10 +31,10 @@ Target "Build" (fun _ ->
 Target "Deploy" (fun _ ->
     !! (buildDir + "/**/*.*")
     -- "*.zip"
-    |> Zip buildDir (deployDir + "ApplicationName." + version + ".zip")
+    |> Zip buildDir (deployDir + "TicTacToe." + version + ".zip")
 )
 
-let testDlls = !! (buildDir + "*.exe")
+let testDlls = !! (buildDir + "*Tests.exe")
 
 Target "NUnitTest" (fun _ ->
   testDlls
@@ -45,8 +45,8 @@ Target "NUnitTest" (fun _ ->
 // Build order
 "Clean"
   ==> "Build"
-  ==> "NUnitTest"
   ==> "Deploy"
+  ==> "NUnitTest"
 
 // start build
 RunTargetOrDefault "Build"

@@ -16,12 +16,12 @@ type public GameUtilities() = class
 
     member x.UpdateGrid (grid:Grid) (selection:Space) =
         (x :> IGameUtilities).UpdateGrid grid selection
+
     member x.GetPossibleMoves (grid:Grid) : Space List =
         (x :> IGameUtilities).GetPossibleMoves grid
-        
+      
     member x.GetSpace (grid:Grid) (position:GridPosition) =
         (x :> IGameUtilities).GetSpace grid position
-
 
     member x.GetRow (grid:Grid) (index:int) =
         (x :> IGameUtilities).GetRow grid index

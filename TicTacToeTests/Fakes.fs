@@ -5,17 +5,17 @@ open FsUnit
 
 open TicTacToe
 
-type fakeAlgorithm(gameUtil : IGameUtilities) = class
+type FakeAlgorithm(gameUtil : IGameUtilities) = class
 
-    member x.gameUtil = gameUtil
+    member x.GameUtil = gameUtil
 
-    interface IAlgorithm with
+    interface IMoveCalculator with
         member x.GetBestScore (grid:Grid) (player:Player) (depth:int) (maximizingPlayer:bool) =
             10
 
 end
 
-type fakeGameUtilities(tieResult:bool, winResult:bool) = class
+type FakeGameUtilities(tieResult:bool, winResult:bool) = class
     let mutable tieCallCount = ref 0
     let mutable winCallCount = ref 0
     let mutable possibleMovesCallCount = ref 0
@@ -74,7 +74,7 @@ type fakeGameUtilities(tieResult:bool, winResult:bool) = class
 
 end
 
-type fakeGameControls() = class
+type FakeGameControls() = class
     
     let mutable callCount = ref 0
     let mutable callGetTurnCount = ref 0
@@ -84,15 +84,16 @@ type fakeGameControls() = class
 
     interface IGameControls with
                     
-        member x.PrintGameResults (results:GameResult) (player:Player) =
+        member x.PrintGameResults (grid:Grid) (results:GameResult) (player:Player) =
             incr callCount
             
         member x.GetTurn grid player=
             incr callGetTurnCount
             {grid = [
-                {Position = (Left, Top); Marked = No};
-                {Position = (Left, Center); Marked = No};
-                {Position = (Left, Bottom); Marked = X}]
+                        {Position = (Left, Top); Marked = No};
+                        {Position = (Left, Center); Marked = No};
+                        {Position = (Left, Bottom); Marked = X}
+                    ]
             }
 
         member x.ChooseMark =
@@ -106,52 +107,65 @@ end
 module FakeSetup =
     let testBoard :Grid =
         {grid = [
-            {Position = (Left, Top); Marked = No};
-            {Position = (Left, Center); Marked = No};
-            {Position = (Left, Bottom); Marked = X};
-            {Position = (Middle, Top); Marked = O};
-            {Position = (Middle, Center); Marked = X};
-            {Position = (Middle, Bottom); Marked = O};
-            {Position = (Right, Top); Marked = O};
-            {Position = (Right, Center); Marked = O};
-            {Position = (Right, Bottom); Marked = X};
-        ]}
+                    {Position = (Left, Top); Marked = No};
+                    {Position = (Left, Center); Marked = No};
+                    {Position = (Left, Bottom); Marked = X};
+                    {Position = (Middle, Top); Marked = O};
+                    {Position = (Middle, Center); Marked = X};
+                    {Position = (Middle, Bottom); Marked = O};
+                    {Position = (Right, Top); Marked = O};
+                    {Position = (Right, Center); Marked = O};
+                    {Position = (Right, Bottom); Marked = X};
+                ]}
     
     let fullBoard : Grid =
         {grid = [
-            {Position = (Left, Top); Marked = O};
-            {Position = (Left, Center); Marked = X};
-            {Position = (Left, Bottom); Marked = X};
-            {Position = (Middle, Top); Marked = X};
-            {Position = (Middle, Center); Marked = X};
-            {Position = (Middle, Bottom); Marked = O};
-            {Position = (Right, Top); Marked = O};
-            {Position = (Right, Center); Marked = O};
-            {Position = (Right, Bottom); Marked = X};
-        ]}
+                    {Position = (Left, Top); Marked = O};
+                    {Position = (Left, Center); Marked = X};
+                    {Position = (Left, Bottom); Marked = X};
+                    {Position = (Middle, Top); Marked = X};
+                    {Position = (Middle, Center); Marked = X};
+                    {Position = (Middle, Bottom); Marked = O};
+                    {Position = (Right, Top); Marked = O};
+                    {Position = (Right, Center); Marked = O};
+                    {Position = (Right, Bottom); Marked = X};
+                ]}
 
     let losingBoard : Grid =
         {grid = [
-            {Position = (Left, Top); Marked = X};
-            {Position = (Left, Center); Marked = X};
-            {Position = (Left, Bottom); Marked = O};
-            {Position = (Middle, Top); Marked = O};
-            {Position = (Middle, Center); Marked = O};
-            {Position = (Middle, Bottom); Marked = X};
-            {Position = (Right, Top); Marked = X};
-            {Position = (Right, Center); Marked = No};
-            {Position = (Right, Bottom); Marked = No};
-        ]}
+                    {Position = (Left, Top); Marked = X};
+                    {Position = (Left, Center); Marked = X};
+                    {Position = (Left, Bottom); Marked = O};
+                    {Position = (Middle, Top); Marked = O};
+                    {Position = (Middle, Center); Marked = O};
+                    {Position = (Middle, Bottom); Marked = X};
+                    {Position = (Right, Top); Marked = X};
+                    {Position = (Right, Center); Marked = No};
+                    {Position = (Right, Bottom); Marked = No};
+                ]}
 
     let needBlockBoard : Grid =
         {grid = [
-            {Position = (Left, Top); Marked = X};
-            {Position = (Left, Center); Marked = No};
-            {Position = (Left, Bottom); Marked = X};
-            {Position = (Middle, Top); Marked = O};
-            {Position = (Middle, Center); Marked = No};
-            {Position = (Middle, Bottom); Marked = No};
-            {Position = (Right, Top); Marked = No};
-            {Position = (Right, Center); Marked = No};
-            {Position = (Right, Bottom); Marked = No};
-        ]}
+                    {Position = (Left, Top); Marked = X};
+                    {Position = (Left, Center); Marked = No};
+                    {Position = (Left, Bottom); Marked = X};
+                    {Position = (Middle, Top); Marked = O};
+                    {Position = (Middle, Center); Marked = No};
+                    {Position = (Middle, Bottom); Marked = No};
+                    {Position = (Right, Top); Marked = No};
+                    {Position = (Right, Center); Marked = No};
+                    {Position = (Right, Bottom); Marked = No};
+                ]}
+
+    let needBlockBoard2 : Grid =
+        {grid = [
+                    {Position = (Left, Top); Marked = X};
+                    {Position = (Left, Center); Marked = O};
+                    {Position = (Left, Bottom); Marked = No};
+                    {Position = (Middle, Top); Marked = O};
+                    {Position = (Middle, Center); Marked = O};
+                    {Position = (Middle, Bottom); Marked = No};
+                    {Position = (Right, Top); Marked = X};
+                    {Position = (Right, Center); Marked = X};
+                    {Position = (Right, Bottom); Marked = No};
+                ]}

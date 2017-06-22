@@ -1,6 +1,5 @@
 namespace TicTacToe
 
-
 type Mark = X | O | No
 
 type GameResult = Win | Tie
@@ -30,6 +29,7 @@ type BoardData = {
 }
 
 type GameResultsData = {
+    grid : Grid
     player : Player
     result : GameResult
 }
