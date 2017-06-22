@@ -1,16 +1,8 @@
 namespace TicTacToe
 
-
-
-// module Space =
-//     type T = {Mark : char; Id : int} with
-//         member this.mark = 
-//             this.Mark
-//         member this.id =
-//             this.Id
-        
-//     let create mark id = 
-//         {Mark = mark ; Id = id}
-
-
-
+module Program =
+    [<EntryPoint>]    
+    let main args =
+        let game = Game(GameControls(GameUtilities(), ComputerPlayer(GameUtilities(), Algorithm(GameUtilities()))), GameUtilities())
+        game.Start()
+        0
