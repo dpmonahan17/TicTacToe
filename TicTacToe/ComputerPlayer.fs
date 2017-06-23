@@ -29,7 +29,7 @@ type ScoringState =
 type IMoveCalculator = 
     abstract member GetBestScore : grid:Grid -> player:Player -> depth:int -> maximizingPlayer:bool -> int
 
-type Algorithm(gameUtils : IGameUtilities) = class
+type MoveCalculator(gameUtils : IGameUtilities) = class
 
     member x.gameUtils = gameUtils
     

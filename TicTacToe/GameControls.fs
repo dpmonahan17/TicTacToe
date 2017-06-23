@@ -8,15 +8,15 @@ type IGameControls =
 
 type public GameControls(gameUtils : IGameUtilities, pcPlayer : IComputerPlayer) = class
 
-    let gameUtils = gameUtils
+    member x.gameUtils = gameUtils
 
-    let markToString (mark:Mark) =
+    member x.MarkToString (mark:Mark) =
         match mark with
         | X -> "x"
         | O -> "o"
         | No -> " "
 
-    let getPositionPerIndex (index:int) =
+    member x.GetPositionPerIndex (index:int) =
         match index with
         | 1 -> (Left,Top)
         | 2 -> (Middle,Top)
@@ -28,10 +28,10 @@ type public GameControls(gameUtils : IGameUtilities, pcPlayer : IComputerPlayer)
         | 8 -> (Middle,Bottom)
         | 9 -> (Right,Bottom)
 
-    let getMark (grid:Grid) (index:int) =
-        (gameUtils.GetSpace grid (getPositionPerIndex index)).Marked |> markToString
+    member x.GetMark (grid:Grid) (index:int) =
+        (gameUtils.GetSpace grid (x.GetPositionPerIndex index)).Marked |> x.MarkToString
         
-    let PrintCurrentGrid grid =
+    member x.PrintCurrentGrid grid =
         System.Console.Clear()
         printf "Board Index - Press Number for grid to place marker\n"
         printf " 1 | 2 | 3 \n"
@@ -39,27 +39,27 @@ type public GameControls(gameUtils : IGameUtilities, pcPlayer : IComputerPlayer)
         printf " 4 | 5 | 6 \n"
         printf "===========\n"
         printf " 7 | 8 | 9 \n\n"
-        printf " %s | %s | %s \n" (getMark grid 1) (getMark grid 2) (getMark grid 3)
+        printf " %s | %s | %s \n" (x.GetMark grid 1) (x.GetMark grid 2) (x.GetMark grid 3)
         printf "===========\n"
-        printf " %s | %s | %s \n" (getMark grid 4) (getMark grid 5) (getMark grid 6)
+        printf " %s | %s | %s \n" (x.GetMark grid 4) (x.GetMark grid 5) (x.GetMark grid 6)
         printf "===========\n"
-        printf " %s | %s | %s \n" (getMark grid 7) (getMark grid 8) (getMark grid 9)
+        printf " %s | %s | %s \n" (x.GetMark grid 7) (x.GetMark grid 8) (x.GetMark grid 9)
 
-    let isInValidMove (grid:Grid) (position:GridPosition) =
+    member x.IsInValidMove (grid:Grid) (position:GridPosition) =
         let index = (grid.grid |> List.filter(fun i -> i.Marked = No) |> List.tryFind(fun i -> i.Position = position))
         match index with
         | None -> true
         | _ -> false
 
-    let rec GetPlayerInput (grid:Grid) player =
+    member x.GetPlayerInput (grid:Grid) player =
         printf "Please press number to select where to play\n"
         let selection : string = System.Console.ReadLine()
         match selection with 
         | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ->
-            let position = selection |> int |> getPositionPerIndex
-            if isInValidMove grid position then
+            let position = selection |> int |> x.GetPositionPerIndex
+            if x.IsInValidMove grid position then
                 printf "Please select empty space\n"
-                GetPlayerInput grid player
+                x.GetPlayerInput grid player
             else
                 let space = {
                     Position = position
@@ -68,12 +68,14 @@ type public GameControls(gameUtils : IGameUtilities, pcPlayer : IComputerPlayer)
                 gameUtils.UpdateGrid grid space
         | _ ->
             printf "Please select number 1-9\n"
-            GetPlayerInput grid player
+            x.GetPlayerInput grid player
 
     member x.PrintGameResults (grid:Grid) (results:GameResult) (player:Player) =
         (x :> IGameControls).PrintGameResults grid results player
+   
     member x.GetTurn (grid:Grid) (player:Player) =
         (x :> IGameControls).GetTurn grid player
+   
     member x.ChooseMark =
         (x :> IGameControls).ChooseMark
 
@@ -83,7 +85,7 @@ type public GameControls(gameUtils : IGameUtilities, pcPlayer : IComputerPlayer)
     interface IGameControls with
     
         member x.PrintGameResults (grid:Grid) (results:GameResult) (player:Player) =
-            PrintCurrentGrid grid
+            x.PrintCurrentGrid grid
             match results with
             | Win -> printf "Player %s has won!\n" player.Name
             | Tie -> printf "Game has ended in a tie\n"
@@ -95,8 +97,8 @@ type public GameControls(gameUtils : IGameUtilities, pcPlayer : IComputerPlayer)
             | "PC Player" -> 
                 gameUtils.UpdateGrid grid (pcPlayer.GetNextMove grid player)
             | _ ->
-                PrintCurrentGrid grid
-                GetPlayerInput grid player
+                x.PrintCurrentGrid grid
+                x.GetPlayerInput grid player
 
         member x.ChooseMark : Mark=
             printf "Please pick your mark: 1 for X or 2 for O\n"

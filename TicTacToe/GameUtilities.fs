@@ -32,12 +32,12 @@ type public GameUtilities() = class
         | O -> -1
         | No -> 0
 
-    member x.CheckBoardIsFull (grid:Grid) =
-        (grid.grid |> List.filter(fun i -> i.Marked = No)).Length < 1
-        
     member x.GetScoreForRow (spaces:Space List) =
         spaces |> List.sumBy(fun i -> x.GetScoreForSpace i)
 
+    member x.CheckBoardIsFull (grid:Grid) =
+        (grid.grid |> List.filter(fun i -> i.Marked = No)).Length < 1
+        
     member x.CheckForXWin (grid:Grid) =
         (x :> IGameUtilities).CheckForXWin grid
 
@@ -46,6 +46,12 @@ type public GameUtilities() = class
 
     member x.CheckForWin (grid:Grid) =
         (x :> IGameUtilities).CheckForWin grid
+
+    member x.CheckForTie (grid:Grid) =
+        (x :> IGameUtilities).CheckForTie grid
+
+    member x.BuildBlankBoard =
+        (x :> IGameUtilities).BuildBlankBoard 
 
     member x.MarkMove move player =
         (x :> IGameUtilities).MarkMove move player

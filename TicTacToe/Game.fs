@@ -4,14 +4,14 @@ open FSharp.Core
 
 type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
 
-    let setupOpponent (player:Player) =
+    member x.GameControls = gameControls
+    member x.GameUtilities = gameUtils
+    
+    member x.setupOpponent (player:Player) =
         match player.Mark with
         | X -> {Name = "PC Player"; Mark = O}
         | O -> {Name = "PC Player"; Mark = X}
 
-    member x.GameControls = gameControls
-    member x.GameUtilities = gameUtils
-    
 
     member x.PrintResults board =
         match board with
@@ -71,7 +71,7 @@ type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
 
     member x.Start() =
         let player1 = x.GameControls.GetPlayerData
-        let player2 = setupOpponent player1
+        let player2 = x.setupOpponent player1
 
         match player1.Mark with
         | X -> OTurn {grid = x.GameUtilities.BuildBlankBoard; players = {PlayerX = player1; PlayerO = player2}} |> x.NextTurn

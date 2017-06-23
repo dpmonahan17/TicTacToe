@@ -5,9 +5,7 @@ open FsUnit
 
 open TicTacToe
 
-type FakeAlgorithm(gameUtil : IGameUtilities) = class
-
-    member x.GameUtil = gameUtil
+type FakeMoveCalculator() = class
 
     interface IMoveCalculator with
         member x.GetBestScore (grid:Grid) (player:Player) (depth:int) (maximizingPlayer:bool) =
@@ -15,7 +13,16 @@ type FakeAlgorithm(gameUtil : IGameUtilities) = class
 
 end
 
-type FakeGameUtilities(tieResult:bool, winResult:bool) = class
+type FakeComputerPlayer(position : GridPosition, mark : Mark) = class
+
+    interface IComputerPlayer with
+
+        member x.GetNextMove (grid:Grid) (player:Player) =
+            {Position = position; Marked = mark}
+
+end
+
+type FakeGameUtilities(tieResult:bool, winResult:bool, xWin:bool, oWin:bool) = class
     let mutable tieCallCount = ref 0
     let mutable winCallCount = ref 0
     let mutable possibleMovesCallCount = ref 0
@@ -27,7 +34,7 @@ type FakeGameUtilities(tieResult:bool, winResult:bool) = class
     member x.PossibleMovesCallCount = possibleMovesCallCount
     member x.TieResult:bool = tieResult            
     member x.WinResult:bool = winResult
-
+    
     interface IGameUtilities with
         member x.UpdateGrid (grid:Grid) (selection:Space) =
             let position = selection.Position
@@ -59,10 +66,10 @@ type FakeGameUtilities(tieResult:bool, winResult:bool) = class
             {Position = (Left, Bottom); Marked = O}]
         
         member x.CheckForXWin grid =
-            false
+            xWin
 
         member x.CheckForOWin grid =
-            false
+            oWin
 
         member x.GetPossibleMoves (grid:Grid) =
             incr possibleMovesCallCount
@@ -169,3 +176,41 @@ module FakeSetup =
                     {Position = (Right, Center); Marked = X};
                     {Position = (Right, Bottom); Marked = No};
                 ]}
+
+    let XWinBoard : Grid =
+        {grid = [
+                    {Position = (Left, Top); Marked = X};
+                    {Position = (Left, Center); Marked = O};
+                    {Position = (Left, Bottom); Marked = No};
+                    {Position = (Middle, Top); Marked = X};
+                    {Position = (Middle, Center); Marked = O};
+                    {Position = (Middle, Bottom); Marked = No};
+                    {Position = (Right, Top); Marked = X};
+                    {Position = (Right, Center); Marked = X};
+                    {Position = (Right, Bottom); Marked = No};
+                ]}
+    
+    let OWinBoard : Grid =
+        {grid = [
+                    {Position = (Left, Top); Marked = O};
+                    {Position = (Left, Center); Marked = O};
+                    {Position = (Left, Bottom); Marked = O};
+                    {Position = (Middle, Top); Marked = X};
+                    {Position = (Middle, Center); Marked = O};
+                    {Position = (Middle, Bottom); Marked = No};
+                    {Position = (Right, Top); Marked = X};
+                    {Position = (Right, Center); Marked = X};
+                    {Position = (Right, Bottom); Marked = No};
+                ]}
+
+    let printPosition (position:GridPosition) =
+        match position with
+            | (Left, Top) -> printf "\nPosition is Left, Top"
+            | (Left, Center) -> printf "\nPosition is Left, Center"
+            | (Left, Bottom) -> printf "\nPosition is Left, Bottom"
+            | (Middle, Top) -> printf "\nPosition is Middle, Top"
+            | (Middle, Center) -> printf "\nPosition is Middle, Center"
+            | (Middle, Bottom) -> printf "\nPosition is Middle, Bottom"
+            | (Right, Top) -> printf "\nPosition is Right, Top"
+            | (Right, Center) -> printf "\nPosition is Right, Center"
+            | (Right, Bottom) -> printf "\nPosition is Right, Bottom"
