@@ -1,18 +1,5 @@
 namespace TicTacToe
 
-module PCTools =
-    let printPosition (position:GridPosition) =
-    match position with
-        | (Left, Top) -> printf "Position is Left, Top"
-        | (Left, Center) -> printf "Position is Left, Center"
-        | (Left, Bottom) -> printf "Position is Left, Bottom"
-        | (Middle, Top) -> printf "Position is Middle, Top"
-        | (Middle, Center) -> printf "Position is Middle, Center"
-        | (Middle, Bottom) -> printf "Position is Middle, Bottom"
-        | (Right, Top) -> printf "Position is Right, Top"
-        | (Right, Center) -> printf "Position is Right, Center"
-        | (Right, Bottom) -> printf "Position is Right, Bottom"
-
 type MoveData = {
     grid : Grid
     moves : Space List
@@ -86,15 +73,13 @@ type MoveCalculator(gameUtils : IGameUtilities) = class
 
 end
 
-
-
 type IComputerPlayer = 
     abstract member GetNextMove : grid:Grid -> player:Player -> Space
 
-type ComputerPlayer(gameUtils : IGameUtilities, algorithm : IMoveCalculator) = class
+type ComputerPlayer(gameUtils : IGameUtilities, moveCalc : IMoveCalculator) = class
     
     member x.GameUtilities = gameUtils
-    member x.Calc = algorithm
+    member x.Calc = moveCalc
 
     member x.GetNextMove (grid:Grid) (player:Player) =
         (x :> IComputerPlayer).GetNextMove grid player
@@ -112,5 +97,4 @@ type ComputerPlayer(gameUtils : IGameUtilities, algorithm : IMoveCalculator) = c
             let space = match bestMove with 
                         | (a,b) -> x.GameUtilities.MarkMove b player
             space
-
 end

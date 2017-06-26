@@ -10,7 +10,6 @@ type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
         | X -> {Name = "PC Player"; Mark = O}
         | O -> {Name = "PC Player"; Mark = X}
 
-
     member x.PrintResults board =
         match board with
         | XTurn _ ->
