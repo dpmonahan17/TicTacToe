@@ -1,7 +1,5 @@
 namespace TicTacToe
 
-open FSharp.Core
-
 type public Game(gameControls :IGameControls, gameUtils: IGameUtilities) = class
 
     member x.GameControls = gameControls

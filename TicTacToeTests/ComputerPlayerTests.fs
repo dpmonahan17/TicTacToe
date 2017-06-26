@@ -8,7 +8,7 @@ namespace TicTacToeTests
         open TicTacToe
 
         [<Test>]
-        let ``ComputerPlayer has method to get next move depending on grid`` () =
+        let ``ComputerPlayer GetNextMove gets next move depending on grid`` () =
             let fakeUtils = GameUtilities()
             let pcPlayer = ComputerPlayer(fakeUtils, MoveCalculator(GameUtilities()))
             let board = FakeSetup.testBoard
@@ -32,7 +32,7 @@ namespace TicTacToeTests
             
 
         [<Test>]
-        let ``ComputerPlayer GetNextMove gets possible moves`` () =
+        let ``ComputerPlayer GetNextMove calls gets possible moves`` () =
             let fakeUtils = FakeGameUtilities((false:bool),(false:bool),false,false)
             let pcPlayer = ComputerPlayer(fakeUtils, FakeMoveCalculator())
             let board = FakeSetup.testBoard

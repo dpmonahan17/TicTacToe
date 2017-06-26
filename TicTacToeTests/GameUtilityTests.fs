@@ -36,7 +36,7 @@ module GameUtilityTests =
         result |> should equal 1
 
     [<Test>]
-    let ``CheckBoard is full returns true if any spaces are not marked`` () =
+    let ``CheckBoardIsFull returns true if any spaces are not marked`` () =
         let gameUtils = GameUtilities()
         let grid = FakeSetup.testBoard
         let grid2 = FakeSetup.fullBoard
