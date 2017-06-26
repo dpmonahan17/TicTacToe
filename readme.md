@@ -3,15 +3,16 @@
 ## Installation 
 - install F# 4.0 - [Download Link](http://fsharp.org/use/windows/) Use Option 2 Instructions.
 
+## Visual Studio Code Setup
+- Install Visual Studio Code
+- Add Ionide-fsharp, Ionide-FAKE, Ionide-Paket extensions to Visual Studio Code
+
 ## Windows - Visual Studio Code
 - clone the repository
 - checkout develop branch
 - download Nunit console runner - [Download Link](https://github.com/nunit/nunit-console/releases/tag/3.6)
 - extract Nunit console runner into /{ProjectRoot}/tools/nunit
 - Open In Visual Studio Code
-
-## Visual Studio Code Setup
-- Add Ionide-fsharp, Ionide-FAKE, Ionide-Paket extensions to Visual Studio Code
 
 ## Building
 - command > run FAKE Build > choose Build
