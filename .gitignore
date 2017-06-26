@@ -3,6 +3,8 @@
 ### F# ###
 lib/debug
 lib/release
+tools/*
+deploy/*
 Debug
 *.suo
 *.user
